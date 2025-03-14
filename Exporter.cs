@@ -7,6 +7,14 @@ using LibreHardwareMonitor.Hardware;
 
 namespace HardwareExporter
 {
+    public static class StringBuilderExtensions
+    {
+        public static StringBuilder AppendLineUnix(this StringBuilder sb, string value = "")
+        {
+            return sb.Append(value).Append('\n');
+        }
+    }
+
     class Program
     {
         private static readonly ManualResetEvent _shutdown = new ManualResetEvent(false);
@@ -19,6 +27,7 @@ namespace HardwareExporter
 
         static void Main(string[] args)
         {
+
             Console.WriteLine("Hardware Metrics Exporter");
             Console.WriteLine("------------------------");
 
@@ -151,14 +160,14 @@ namespace HardwareExporter
                     }
 
                     // Add build info
-                    metrics.AppendLine("# HELP node_exporter_build_info Build information");
-                    metrics.AppendLine("# TYPE node_exporter_build_info gauge");
-                    metrics.AppendLine($"node_exporter_build_info{{version=\"{Assembly.GetExecutingAssembly().GetName().Version}\"}} 1");
+                    metrics.AppendLineUnix("# HELP node_exporter_build_info Build information");
+                    metrics.AppendLineUnix("# TYPE node_exporter_build_info gauge");
+                    metrics.AppendLineUnix($"node_exporter_build_info{{version=\"{Assembly.GetExecutingAssembly().GetName().Version}\"}} 1");
 
                     // Add Errors total
-                    metrics.AppendLine("# HELP node_exporter_errors_total Errors total");
-                    metrics.AppendLine("# TYPE node_exporter_errors_total counter");
-                    metrics.AppendLine($"node_exporter_errors_total {errorsCount}");
+                    metrics.AppendLineUnix("# HELP node_exporter_errors_total Errors total");
+                    metrics.AppendLineUnix("# TYPE node_exporter_errors_total counter");
+                    metrics.AppendLineUnix($"node_exporter_errors_total {errorsCount}");
 
                     // Send response
                     byte[] buffer = Encoding.UTF8.GetBytes(metrics.ToString());
@@ -273,47 +282,47 @@ namespace HardwareExporter
 
 
                 // Chip names
-                metrics.AppendLine("# HELP node_hwmon_chip_names Hardware monitoring chip names");
-                metrics.AppendLine("# TYPE node_hwmon_chip_names gauge");
+                metrics.AppendLineUnix("# HELP node_hwmon_chip_names Hardware monitoring chip names");
+                metrics.AppendLineUnix("# TYPE node_hwmon_chip_names gauge");
                 // All chip names mapping
                 foreach (var chipName in chipNames)
                 {
-                    metrics.AppendLine($"node_hwmon_chip_names{{chip=\"{chipName.Key}\",name=\"{chipName.Value}\"}} 1");
+                    metrics.AppendLineUnix($"node_hwmon_chip_names{{chip=\"{chipName.Key}\",chip_name=\"{chipName.Value}\"}} 1");
                 }
 
                 // Hardware names
-                metrics.AppendLine("# HELP node_hwmon_hardware_names Hardware monitoring hardware names");
-                metrics.AppendLine("# TYPE node_hwmon_hardware_names gauge");
+                metrics.AppendLineUnix("# HELP node_hwmon_hardware_names Hardware monitoring hardware names");
+                metrics.AppendLineUnix("# TYPE node_hwmon_hardware_names gauge");
                 // All hardware names mapping
                 foreach (var hardwareName in hardwareNames)
                 {
-                    metrics.AppendLine($"node_hwmon_hardware_names{{hardware=\"{hardwareName.Key}\",name=\"{hardwareName.Value}\"}} 1");
+                    metrics.AppendLineUnix($"node_hwmon_hardware_names{{hardware=\"{hardwareName.Key}\",hardware_name=\"{hardwareName.Value}\"}} 1");
                 }
 
                 // Temperature metrics
-                metrics.AppendLine("# HELP node_hwmon_temp_celsius Hardware monitoring temperature");
-                metrics.AppendLine("# TYPE node_hwmon_temp_celsius gauge");
+                metrics.AppendLineUnix("# HELP node_hwmon_temp_celsius Hardware monitoring temperature");
+                metrics.AppendLineUnix("# TYPE node_hwmon_temp_celsius gauge");
                 foreach (var sensor in temps)
                 {
-                    metrics.AppendLine($"node_hwmon_temp_celsius{{chip=\"{sensor.Identifier}\",hardware=\"{sensor.Hardware.Identifier}\"}} {sensor.Value.Value}");
+                    metrics.AppendLineUnix($"node_hwmon_temp_celsius{{chip=\"{sensor.Identifier}\",hardware=\"{sensor.Hardware.Identifier}\"}} {sensor.Value.Value}");
                 }
 
                 // PWM metrics
-                metrics.AppendLine("# HELP node_hwmon_pwm Hardware monitoring fan PWM");
-                metrics.AppendLine(
+                metrics.AppendLineUnix("# HELP node_hwmon_pwm Hardware monitoring fan PWM");
+                metrics.AppendLineUnix(
                     "# TYPE node_hwmon_pwm gauge");
                 foreach (var sensor in pwms)
                 {
-                    metrics.AppendLine($"node_hwmon_pwm{{chip=\"{sensor.Hardware.Identifier}\",hardware=\"{sensor.Hardware.Identifier}\"}} {sensor.Value.Value / 100 * 255}");
+                    metrics.AppendLineUnix($"node_hwmon_pwm{{chip=\"{sensor.Hardware.Identifier}\",hardware=\"{sensor.Hardware.Identifier}\"}} {sensor.Value.Value / 100 * 255}");
                 }
 
                 // Fan RPM metrics
-                metrics.AppendLine("# HELP node_hwmon_fan_rpm Hardware monitoring fan RPM");
-                metrics.AppendLine(
+                metrics.AppendLineUnix("# HELP node_hwmon_fan_rpm Hardware monitoring fan RPM");
+                metrics.AppendLineUnix(
                     "# TYPE node_hwmon_fan_rpm gauge");
                 foreach (var sensor in rpms)
                 {
-                    metrics.AppendLine($"node_hwmon_fan_rpm{{chip=\"{sensor.Hardware.Identifier}\",hardware=\"{sensor.Hardware.Identifier}\"}} {sensor.Value.Value}");
+                    metrics.AppendLineUnix($"node_hwmon_fan_rpm{{chip=\"{sensor.Hardware.Identifier}\",hardware=\"{sensor.Hardware.Identifier}\"}} {sensor.Value.Value}");
                 }
             }
             finally
@@ -331,27 +340,28 @@ namespace HardwareExporter
 
             foreach (string name in instancename)
             {
+                // Using RawValue gives the accumulation instead of per second calculation
                 using (var counter = new PerformanceCounter("Network Interface", "Bytes Received/sec", name, true))
-                {
-                    txReadings[name] = counter.RawValue;
-                }
-                using (var counter = new PerformanceCounter("Network Interface", "Bytes Sent/sec", name, true))
                 {
                     rxReadings[name] = counter.RawValue;
                 }
+                using (var counter = new PerformanceCounter("Network Interface", "Bytes Sent/sec", name, true))
+                {
+                    txReadings[name] = counter.RawValue;
+                }
             }
-            metrics.AppendLine("# HELP node_network_receive_bytes_total Network device statistic receive_bytes");
-            metrics.AppendLine("# TYPE node_network_receive_bytes_total counter");
+            metrics.AppendLineUnix("# HELP node_network_receive_bytes_total Network device statistic receive_bytes");
+            metrics.AppendLineUnix("# TYPE node_network_receive_bytes_total counter");
             foreach(var name in instancename)
             {
-                metrics.AppendLine($"node_network_receive_bytes_total{{device=\"{name}\"}} {rxReadings[name]}");
+                metrics.AppendLineUnix($"node_network_receive_bytes_total{{device=\"{name}\"}} {rxReadings[name]}");
             }
 
-            metrics.AppendLine("# HELP node_network_transmit_bytes_total Network device statistic transmit_bytes");
-            metrics.AppendLine("# TYPE node_network_transmit_bytes_total counter");
+            metrics.AppendLineUnix("# HELP node_network_transmit_bytes_total Network device statistic transmit_bytes");
+            metrics.AppendLineUnix("# TYPE node_network_transmit_bytes_total counter");
             foreach (var name in instancename)
             {
-                metrics.AppendLine($"node_network_transmit_bytes_total{{device=\"{name}\"}} {txReadings[name]}");
+                metrics.AppendLineUnix($"node_network_transmit_bytes_total{{device=\"{name}\"}} {txReadings[name]}");
             }
         }
 
@@ -360,38 +370,40 @@ namespace HardwareExporter
             PerformanceCounterCategory category = new PerformanceCounterCategory("Processor Information");
             String[] instancename = category.GetInstanceNames();
 
-            metrics.AppendLine("# HELP node_cpu_seconds_total Time that processor spent in different modes (dpc, idle, interrupt, privileged, user)");
-            metrics.AppendLine("# TYPE node_cpu_seconds_total counter");
+            metrics.AppendLineUnix("# HELP node_cpu_seconds_total Time that processor spent in different modes (dpc, idle, interrupt, privileged, user)");
+            metrics.AppendLineUnix("# TYPE node_cpu_seconds_total counter");
 
             foreach (string name in instancename)
             {
                 if (name.EndsWith("_Total"))
                     continue;
+
+                // Using RawValue gives the accumulation instead of per second calculation
                 using (var counter = new PerformanceCounter("Processor Information", "% DPC Time", name, true))
                 {
-                    metrics.AppendLine($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"dpc\"}} {counter.RawValue}");
+                    metrics.AppendLineUnix($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"dpc\"}} {counter.RawValue / 10000000f}");
                 }
                 using (var counter = new PerformanceCounter("Processor Information", "% Idle Time", name, true))
                 {
-                    metrics.AppendLine($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"idle\"}} {counter.RawValue}");
+                    metrics.AppendLineUnix($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"idle\"}} {counter.RawValue / 10000000f}");
                 }
                 using (var counter = new PerformanceCounter("Processor Information", "% Interrupt Time", name, true))
                 {
-                    metrics.AppendLine($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"interrupt\"}} {counter.RawValue}");
+                    metrics.AppendLineUnix($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"interrupt\"}} {counter.RawValue / 10000000f}");
                 }
                 using (var counter = new PerformanceCounter("Processor Information", "% Privileged Time", name, true))
                 {
-                    metrics.AppendLine($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"privileged\"}} {counter.RawValue}");
+                    metrics.AppendLineUnix($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"privileged\"}} {counter.RawValue / 10000000f}");
                 }
                 using (var counter = new PerformanceCounter("Processor Information", "% User Time", name, true))
                 {
-                    metrics.AppendLine($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"user\"}} {counter.RawValue}");
+                    metrics.AppendLineUnix($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"user\"}} {counter.RawValue / 10000000f}");
                 }
             }
 
             // Second metric - CPU Power Consumption
-            metrics.AppendLine("# HELP node_cpu_power_watts CPU power consumption in watts");
-            metrics.AppendLine("# TYPE node_cpu_power_watts gauge");
+            metrics.AppendLineUnix("# HELP node_cpu_power_watts CPU power consumption in watts");
+            metrics.AppendLineUnix("# TYPE node_cpu_power_watts gauge");
 
             // Output all CPU power metrics
             foreach (var hardware in computer.Hardware.Where(h => h.HardwareType == HardwareType.Cpu))
@@ -407,7 +419,7 @@ namespace HardwareExporter
                                           sensor.Name.Contains("Core") ? "cores" :
                                           sensor.Name.ToLower().Replace(" ", "_");
 
-                        metrics.AppendLine($"node_cpu_power_watts{{cpu=\"{cpuName}\", type=\"{powerType}\"}} {sensor.Value}");
+                        metrics.AppendLineUnix($"node_cpu_power_watts{{cpu=\"{cpuName}\", type=\"{powerType}\"}} {sensor.Value}");
                     }
                 }
             }
@@ -457,55 +469,55 @@ namespace HardwareExporter
                 }
 
                 // Convert from MB to bytes
-                const long bytesInMB = 1024 * 1024;
+                const long bytesInGB = 1024 * 1024 * 1024;
 
                 // Output Total Memory metric with help and type
-                metrics.AppendLine("# HELP node_memory_MemTotal_bytes Memory information field MemTotal_bytes");
-                metrics.AppendLine("# TYPE node_memory_MemTotal_bytes gauge");
+                metrics.AppendLineUnix("# HELP node_memory_MemTotal_bytes Memory information field MemTotal_bytes");
+                metrics.AppendLineUnix("# TYPE node_memory_MemTotal_bytes gauge");
                 if (availableMemory.HasValue && usedMemory.HasValue)
                 {
-                    metrics.AppendLine($"node_memory_MemTotal_bytes {(long)((availableMemory.Value + usedMemory.Value) * bytesInMB)}");
+                    metrics.AppendLineUnix($"node_memory_MemTotal_bytes {(long)((availableMemory.Value + usedMemory.Value) * bytesInGB)}");
                 }
                 else
                 {
-                    metrics.AppendLine("node_memory_MemTotal_bytes 0");
+                    metrics.AppendLineUnix("node_memory_MemTotal_bytes 0");
                 }
 
                 // Output Available Memory metric with help and type
-                metrics.AppendLine("# HELP node_memory_MemAvailable_bytes Memory information field MemAvailable_bytes");
-                metrics.AppendLine("# TYPE node_memory_MemAvailable_bytes gauge");
+                metrics.AppendLineUnix("# HELP node_memory_MemAvailable_bytes Memory information field MemAvailable_bytes");
+                metrics.AppendLineUnix("# TYPE node_memory_MemAvailable_bytes gauge");
                 if (availableMemory.HasValue)
                 {
-                    metrics.AppendLine($"node_memory_MemAvailable_bytes {(long)(availableMemory.Value * bytesInMB)}");
+                    metrics.AppendLineUnix($"node_memory_MemAvailable_bytes {(long)(availableMemory.Value * bytesInGB)}");
                 }
                 else
                 {
-                    metrics.AppendLine("node_memory_MemAvailable_bytes 0");
+                    metrics.AppendLineUnix("node_memory_MemAvailable_bytes 0");
                 }
 
                 // Output Virtual Memory Total metric with help and type
-                metrics.AppendLine("# HELP node_memory_VirtualMemoryTotal_bytes Memory information field VirtualMemoryTotal_bytes");
-                metrics.AppendLine("# TYPE node_memory_VirtualMemoryTotal_bytes gauge");
+                metrics.AppendLineUnix("# HELP node_memory_VirtualMemoryTotal_bytes Memory information field VirtualMemoryTotal_bytes");
+                metrics.AppendLineUnix("# TYPE node_memory_VirtualMemoryTotal_bytes gauge");
                 if (availableVirtualMemory.HasValue && usedVirtualMemory.HasValue)
                 {
-                    metrics.AppendLine($"node_memory_VirtualMemoryTotal_bytes {(long)((availableVirtualMemory.Value + usedVirtualMemory.Value) * bytesInMB)}");
+                    metrics.AppendLineUnix($"node_memory_VirtualMemoryTotal_bytes {(long)((availableVirtualMemory.Value + usedVirtualMemory.Value) * bytesInGB)}");
                 }
                 else
                 {
-                    metrics.AppendLine("node_memory_VirtualMemoryTotal_bytes 0");
+                    metrics.AppendLineUnix("node_memory_VirtualMemoryTotal_bytes 0");
                 }
 
                 // Output Virtual Memory Available metric with help and type
-                metrics.AppendLine(
+                metrics.AppendLineUnix(
                     "# HELP node_memory_VirtualMemoryAvailable_bytes Memory information field VirtualMemoryAvailable_bytes");
-                metrics.AppendLine("# TYPE node_memory_VirtualMemoryAvailable_bytes gauge");
+                metrics.AppendLineUnix("# TYPE node_memory_VirtualMemoryAvailable_bytes gauge");
                 if (availableVirtualMemory.HasValue)
                 {
-                    metrics.AppendLine($"node_memory_VirtualMemoryAvailable_bytes {(long)(availableVirtualMemory.Value * bytesInMB)}");
+                    metrics.AppendLineUnix($"node_memory_VirtualMemoryAvailable_bytes {(long)(availableVirtualMemory.Value * bytesInGB)}");
                 }
                 else
                 {
-                    metrics.AppendLine("node_memory_VirtualMemoryAvailable_bytes 0");
+                    metrics.AppendLineUnix("node_memory_VirtualMemoryAvailable_bytes 0");
                 }
 
 
