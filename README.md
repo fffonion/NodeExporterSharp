@@ -40,7 +40,7 @@ By default, all collectors are enabled.
 ## Sample Output
 
 ```
- HELP node_hwmon_chip_names Hardware monitoring chip names
+# HELP node_hwmon_chip_names Hardware monitoring chip names
 # TYPE node_hwmon_chip_names gauge
 node_hwmon_chip_names{chip="/lpc/nct6798d/0/control/0",name="Fan #1"} 1
 node_hwmon_chip_names{chip="/lpc/nct6798d/0/control/1",name="Fan #2"} 1
@@ -115,21 +115,21 @@ node_hwmon_hardware_names{hardware="/nvme/0",name="Samsung SSD 970 EVO Plus 1TB"
 node_hwmon_hardware_names{hardware="/nvme/1",name="Samsung SSD 990 PRO 2TB"} 1
 # HELP node_hwmon_temp_celsius Hardware monitoring temperature
 # TYPE node_hwmon_temp_celsius gauge
-node_hwmon_temp_celsius{chip="/lpc/nct6798d/0/temperature/0",hardware="/lpc/nct6798d/0"} 44
+node_hwmon_temp_celsius{chip="/lpc/nct6798d/0/temperature/0",hardware="/lpc/nct6798d/0"} 45
 node_hwmon_temp_celsius{chip="/lpc/nct6798d/0/temperature/1",hardware="/lpc/nct6798d/0"} 42.5
 node_hwmon_temp_celsius{chip="/lpc/nct6798d/0/temperature/2",hardware="/lpc/nct6798d/0"} 39
 node_hwmon_temp_celsius{chip="/lpc/nct6798d/0/temperature/3",hardware="/lpc/nct6798d/0"} 43.5
 node_hwmon_temp_celsius{chip="/lpc/nct6798d/0/temperature/4",hardware="/lpc/nct6798d/0"} 7
 node_hwmon_temp_celsius{chip="/lpc/nct6798d/0/temperature/5",hardware="/lpc/nct6798d/0"} -13
 node_hwmon_temp_celsius{chip="/lpc/nct6798d/0/temperature/6",hardware="/lpc/nct6798d/0"} 25
-node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/0",hardware="/intelcpu/0"} 45
-node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/1",hardware="/intelcpu/0"} 40.285713
+node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/0",hardware="/intelcpu/0"} 43
+node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/1",hardware="/intelcpu/0"} 39.92857
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/2",hardware="/intelcpu/0"} 40
-node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/3",hardware="/intelcpu/0"} 41
-node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/4",hardware="/intelcpu/0"} 44
+node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/3",hardware="/intelcpu/0"} 42
+node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/4",hardware="/intelcpu/0"} 40
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/5",hardware="/intelcpu/0"} 42
-node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/6",hardware="/intelcpu/0"} 40
-node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/7",hardware="/intelcpu/0"} 45
+node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/6",hardware="/intelcpu/0"} 43
+node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/7",hardware="/intelcpu/0"} 40
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/8",hardware="/intelcpu/0"} 38
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/9",hardware="/intelcpu/0"} 38
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/10",hardware="/intelcpu/0"} 38
@@ -138,13 +138,13 @@ node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/12",hardware="/intelcpu/0"
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/13",hardware="/intelcpu/0"} 40
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/14",hardware="/intelcpu/0"} 40
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/15",hardware="/intelcpu/0"} 40
-node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/16",hardware="/intelcpu/0"} 44
+node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/16",hardware="/intelcpu/0"} 41
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/17",hardware="/intelcpu/0"} 60
-node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/18",hardware="/intelcpu/0"} 59
-node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/19",hardware="/intelcpu/0"} 56
+node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/18",hardware="/intelcpu/0"} 58
+node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/19",hardware="/intelcpu/0"} 60
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/20",hardware="/intelcpu/0"} 58
-node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/21",hardware="/intelcpu/0"} 60
-node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/22",hardware="/intelcpu/0"} 55
+node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/21",hardware="/intelcpu/0"} 57
+node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/22",hardware="/intelcpu/0"} 60
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/23",hardware="/intelcpu/0"} 62
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/24",hardware="/intelcpu/0"} 62
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/25",hardware="/intelcpu/0"} 62
@@ -154,7 +154,7 @@ node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/28",hardware="/intelcpu/0"
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/29",hardware="/intelcpu/0"} 60
 node_hwmon_temp_celsius{chip="/intelcpu/0/temperature/30",hardware="/intelcpu/0"} 60
 node_hwmon_temp_celsius{chip="/gpu-nvidia/0/temperature/0",hardware="/gpu-nvidia/0"} 46
-node_hwmon_temp_celsius{chip="/gpu-nvidia/0/temperature/2",hardware="/gpu-nvidia/0"} 56
+node_hwmon_temp_celsius{chip="/gpu-nvidia/0/temperature/2",hardware="/gpu-nvidia/0"} 55.75
 node_hwmon_temp_celsius{chip="/nvme/0/temperature/0",hardware="/nvme/0"} 52
 node_hwmon_temp_celsius{chip="/nvme/0/temperature/6",hardware="/nvme/0"} 52
 node_hwmon_temp_celsius{chip="/nvme/0/temperature/7",hardware="/nvme/0"} 60
@@ -163,8 +163,8 @@ node_hwmon_temp_celsius{chip="/nvme/1/temperature/6",hardware="/nvme/1"} 54
 node_hwmon_temp_celsius{chip="/nvme/1/temperature/7",hardware="/nvme/1"} 59
 # HELP node_hwmon_pwm Hardware monitoring fan PWM
 # TYPE node_hwmon_pwm gauge
-node_hwmon_pwm{chip="/lpc/nct6798d/0",hardware="/lpc/nct6798d/0"} 102
-node_hwmon_pwm{chip="/lpc/nct6798d/0",hardware="/lpc/nct6798d/0"} 102
+node_hwmon_pwm{chip="/lpc/nct6798d/0",hardware="/lpc/nct6798d/0"} 95
+node_hwmon_pwm{chip="/lpc/nct6798d/0",hardware="/lpc/nct6798d/0"} 95
 node_hwmon_pwm{chip="/lpc/nct6798d/0",hardware="/lpc/nct6798d/0"} 153
 node_hwmon_pwm{chip="/lpc/nct6798d/0",hardware="/lpc/nct6798d/0"} 153
 node_hwmon_pwm{chip="/lpc/nct6798d/0",hardware="/lpc/nct6798d/0"} 153
@@ -174,8 +174,8 @@ node_hwmon_pwm{chip="/gpu-nvidia/0",hardware="/gpu-nvidia/0"} 0
 node_hwmon_pwm{chip="/gpu-nvidia/0",hardware="/gpu-nvidia/0"} 0
 # HELP node_hwmon_fan_rpm Hardware monitoring fan RPM
 # TYPE node_hwmon_fan_rpm gauge
-node_hwmon_fan_rpm{chip="/lpc/nct6798d/0",hardware="/lpc/nct6798d/0"} 1124.0632
-node_hwmon_fan_rpm{chip="/lpc/nct6798d/0",hardware="/lpc/nct6798d/0"} 961.53845
+node_hwmon_fan_rpm{chip="/lpc/nct6798d/0",hardware="/lpc/nct6798d/0"} 1154.8331
+node_hwmon_fan_rpm{chip="/lpc/nct6798d/0",hardware="/lpc/nct6798d/0"} 965.6652
 node_hwmon_fan_rpm{chip="/lpc/nct6798d/0",hardware="/lpc/nct6798d/0"} 0
 node_hwmon_fan_rpm{chip="/lpc/nct6798d/0",hardware="/lpc/nct6798d/0"} 0
 node_hwmon_fan_rpm{chip="/lpc/nct6798d/0",hardware="/lpc/nct6798d/0"} 0
@@ -185,45 +185,118 @@ node_hwmon_fan_rpm{chip="/gpu-nvidia/0",hardware="/gpu-nvidia/0"} 0
 node_hwmon_fan_rpm{chip="/gpu-nvidia/0",hardware="/gpu-nvidia/0"} 0
 # HELP node_network_receive_bytes_total Network device statistic receive_bytes
 # TYPE node_network_receive_bytes_total counter
-node_network_receive_bytes_total{device="本地连接* 1"} 0
-node_network_receive_bytes_total{device="本地连接* 2"} 0
-node_network_receive_bytes_total{device="蓝牙网络连接"} 0
-node_network_receive_bytes_total{device="以太网"} 0
-node_network_receive_bytes_total{device="WLAN"} 0
+node_network_receive_bytes_total{device="Intel[R] Wi-Fi 6E AX211 160MHz"} 4.5345777E+09
+node_network_receive_bytes_total{device="Intel[R] Ethernet Controller I226-V"} 0
 # HELP node_network_transmit_bytes_total Network device statistic transmit_bytes
 # TYPE node_network_transmit_bytes_total counter
-node_network_transmit_bytes_total{device="本地连接* 1"} 0
-node_network_transmit_bytes_total{device="本地连接* 2"} 0
-node_network_transmit_bytes_total{device="蓝牙网络连接"} 0
-node_network_transmit_bytes_total{device="以太网"} 0
-node_network_transmit_bytes_total{device="WLAN"} 0
-# HELP node_cpu_usage_percentage CPU usage percentage per core and total
-# TYPE node_cpu_usage_percentage gauge
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="total"} 6.967431
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #1 Thread #1"} 27.872414
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #1 Thread #2"} 0
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #2 Thread #1"} 35.532093
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #2 Thread #2"} 0
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #3 Thread #1"} 30.006403
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #3 Thread #2"} 0
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #4 Thread #1"} 31.174082
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #4 Thread #2"} 0
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #5 Thread #1"} 14.635295
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #5 Thread #2"} 0.59766173
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #6 Thread #1"} 28.752644
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #6 Thread #2"} 0.74141026
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #7"} 2.2586584
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #8"} 0.94723105
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #9"} 0.8518398
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #10"} 0
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #11"} 0.6394565
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #12"} 0
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #13"} 3.5041273
-node_cpu_usage_percentage{cpu="13th Gen Intel Core i5-13600KF", core="CPU Core #14"} 1.3972819
+node_network_transmit_bytes_total{device="Intel[R] Wi-Fi 6E AX211 160MHz"} 872547000
+node_network_transmit_bytes_total{device="Intel[R] Ethernet Controller I226-V"} 0
+# HELP node_cpu_seconds_total Time that processor spent in different modes (dpc, idle, interrupt, privileged, user)
+# TYPE node_cpu_seconds_total counter
+node_cpu_seconds_total{cpu="0,10",mode="dpc"} 277187500
+node_cpu_seconds_total{cpu="0,10",mode="idle"} 112604218750
+node_cpu_seconds_total{cpu="0,10",mode="interrupt"} 636718750
+node_cpu_seconds_total{cpu="0,10",mode="privileged"} 10445156250
+node_cpu_seconds_total{cpu="0,10",mode="user"} 28782031250
+node_cpu_seconds_total{cpu="0,16",mode="dpc"} 62187500
+node_cpu_seconds_total{cpu="0,16",mode="idle"} 142234062500
+node_cpu_seconds_total{cpu="0,16",mode="interrupt"} 361718750
+node_cpu_seconds_total{cpu="0,16",mode="privileged"} 2998437500
+node_cpu_seconds_total{cpu="0,16",mode="user"} 6598906250
+node_cpu_seconds_total{cpu="0,12",mode="dpc"} 112968750
+node_cpu_seconds_total{cpu="0,12",mode="idle"} 142328593750
+node_cpu_seconds_total{cpu="0,12",mode="interrupt"} 385937500
+node_cpu_seconds_total{cpu="0,12",mode="privileged"} 2917656250
+node_cpu_seconds_total{cpu="0,12",mode="user"} 6585000000
+node_cpu_seconds_total{cpu="0,3",mode="dpc"} 444218750
+node_cpu_seconds_total{cpu="0,3",mode="idle"} 142649218750
+node_cpu_seconds_total{cpu="0,3",mode="interrupt"} 505468750
+node_cpu_seconds_total{cpu="0,3",mode="privileged"} 2730156250
+node_cpu_seconds_total{cpu="0,3",mode="user"} 6451875000
+node_cpu_seconds_total{cpu="0,19",mode="dpc"} 115781250
+node_cpu_seconds_total{cpu="0,19",mode="idle"} 117387187500
+node_cpu_seconds_total{cpu="0,19",mode="interrupt"} 324843750
+node_cpu_seconds_total{cpu="0,19",mode="privileged"} 29527656250
+node_cpu_seconds_total{cpu="0,19",mode="user"} 4916562500
+node_cpu_seconds_total{cpu="0,11",mode="dpc"} 42656250
+node_cpu_seconds_total{cpu="0,11",mode="idle"} 141864062500
+node_cpu_seconds_total{cpu="0,11",mode="interrupt"} 157968750
+node_cpu_seconds_total{cpu="0,11",mode="privileged"} 1969843750
+node_cpu_seconds_total{cpu="0,11",mode="user"} 7997343750
+node_cpu_seconds_total{cpu="0,7",mode="dpc"} 55312500
+node_cpu_seconds_total{cpu="0,7",mode="idle"} 142707187500
+node_cpu_seconds_total{cpu="0,7",mode="interrupt"} 189062500
+node_cpu_seconds_total{cpu="0,7",mode="privileged"} 2030781250
+node_cpu_seconds_total{cpu="0,7",mode="user"} 7093281250
+node_cpu_seconds_total{cpu="0,0",mode="dpc"} 4733906250
+node_cpu_seconds_total{cpu="0,0",mode="idle"} 112513281250
+node_cpu_seconds_total{cpu="0,0",mode="interrupt"} 4477500000
+node_cpu_seconds_total{cpu="0,0",mode="privileged"} 16848906250
+node_cpu_seconds_total{cpu="0,0",mode="user"} 22470781250
+node_cpu_seconds_total{cpu="0,14",mode="dpc"} 55156250
+node_cpu_seconds_total{cpu="0,14",mode="idle"} 143838906250
+node_cpu_seconds_total{cpu="0,14",mode="interrupt"} 298281250
+node_cpu_seconds_total{cpu="0,14",mode="privileged"} 2248906250
+node_cpu_seconds_total{cpu="0,14",mode="user"} 5743750000
+node_cpu_seconds_total{cpu="0,5",mode="dpc"} 171875000
+node_cpu_seconds_total{cpu="0,5",mode="idle"} 140360781250
+node_cpu_seconds_total{cpu="0,5",mode="interrupt"} 191250000
+node_cpu_seconds_total{cpu="0,5",mode="privileged"} 2450156250
+node_cpu_seconds_total{cpu="0,5",mode="user"} 9020468750
+node_cpu_seconds_total{cpu="0,15",mode="dpc"} 46406250
+node_cpu_seconds_total{cpu="0,15",mode="idle"} 144872187500
+node_cpu_seconds_total{cpu="0,15",mode="interrupt"} 272343750
+node_cpu_seconds_total{cpu="0,15",mode="privileged"} 2089531250
+node_cpu_seconds_total{cpu="0,15",mode="user"} 4869843750
+node_cpu_seconds_total{cpu="0,2",mode="dpc"} 1138125000
+node_cpu_seconds_total{cpu="0,2",mode="idle"} 103644062500
+node_cpu_seconds_total{cpu="0,2",mode="interrupt"} 774218750
+node_cpu_seconds_total{cpu="0,2",mode="privileged"} 12774375000
+node_cpu_seconds_total{cpu="0,2",mode="user"} 35413125000
+node_cpu_seconds_total{cpu="0,9",mode="dpc"} 38750000
+node_cpu_seconds_total{cpu="0,9",mode="idle"} 143952968750
+node_cpu_seconds_total{cpu="0,9",mode="interrupt"} 170937500
+node_cpu_seconds_total{cpu="0,9",mode="privileged"} 1857968750
+node_cpu_seconds_total{cpu="0,9",mode="user"} 6020312500
+node_cpu_seconds_total{cpu="0,8",mode="dpc"} 437812500
+node_cpu_seconds_total{cpu="0,8",mode="idle"} 114633437500
+node_cpu_seconds_total{cpu="0,8",mode="interrupt"} 845312500
+node_cpu_seconds_total{cpu="0,8",mode="privileged"} 10436718750
+node_cpu_seconds_total{cpu="0,8",mode="user"} 26761406250
+node_cpu_seconds_total{cpu="0,4",mode="dpc"} 1124843750
+node_cpu_seconds_total{cpu="0,4",mode="idle"} 112737187500
+node_cpu_seconds_total{cpu="0,4",mode="interrupt"} 1531562500
+node_cpu_seconds_total{cpu="0,4",mode="privileged"} 11430625000
+node_cpu_seconds_total{cpu="0,4",mode="user"} 27663750000
+node_cpu_seconds_total{cpu="0,18",mode="dpc"} 71562500
+node_cpu_seconds_total{cpu="0,18",mode="idle"} 144635312500
+node_cpu_seconds_total{cpu="0,18",mode="interrupt"} 269375000
+node_cpu_seconds_total{cpu="0,18",mode="privileged"} 2130312500
+node_cpu_seconds_total{cpu="0,18",mode="user"} 5065781250
+node_cpu_seconds_total{cpu="0,6",mode="dpc"} 463281250
+node_cpu_seconds_total{cpu="0,6",mode="idle"} 113552500000
+node_cpu_seconds_total{cpu="0,6",mode="interrupt"} 672031250
+node_cpu_seconds_total{cpu="0,6",mode="privileged"} 10339218750
+node_cpu_seconds_total{cpu="0,6",mode="user"} 27939843750
+node_cpu_seconds_total{cpu="0,13",mode="dpc"} 50781250
+node_cpu_seconds_total{cpu="0,13",mode="idle"} 144806093750
+node_cpu_seconds_total{cpu="0,13",mode="interrupt"} 288281250
+node_cpu_seconds_total{cpu="0,13",mode="privileged"} 2159531250
+node_cpu_seconds_total{cpu="0,13",mode="user"} 4865937500
+node_cpu_seconds_total{cpu="0,1",mode="dpc"} 209218750
+node_cpu_seconds_total{cpu="0,1",mode="idle"} 144080937500
+node_cpu_seconds_total{cpu="0,1",mode="interrupt"} 210937500
+node_cpu_seconds_total{cpu="0,1",mode="privileged"} 2197812500
+node_cpu_seconds_total{cpu="0,1",mode="user"} 5552656250
+node_cpu_seconds_total{cpu="0,17",mode="dpc"} 44531250
+node_cpu_seconds_total{cpu="0,17",mode="idle"} 144232343750
+node_cpu_seconds_total{cpu="0,17",mode="interrupt"} 287031250
+node_cpu_seconds_total{cpu="0,17",mode="privileged"} 2298125000
+node_cpu_seconds_total{cpu="0,17",mode="user"} 5301093750
 # HELP node_cpu_power_watts CPU power consumption in watts
 # TYPE node_cpu_power_watts gauge
-node_cpu_power_watts{cpu="13th Gen Intel Core i5-13600KF", type="package"} 37.530994
-node_cpu_power_watts{cpu="13th Gen Intel Core i5-13600KF", type="cores"} 27.333067
+node_cpu_power_watts{cpu="13th Gen Intel Core i5-13600KF", type="package"} 45.94235
+node_cpu_power_watts{cpu="13th Gen Intel Core i5-13600KF", type="cores"} 35.34013
 node_cpu_power_watts{cpu="13th Gen Intel Core i5-13600KF", type="cpu_memory"} 0
 node_cpu_power_watts{cpu="13th Gen Intel Core i5-13600KF", type="cpu_platform"} 0
 # HELP node_memory_MemTotal_bytes Memory information field MemTotal_bytes
@@ -231,13 +304,13 @@ node_cpu_power_watts{cpu="13th Gen Intel Core i5-13600KF", type="cpu_platform"} 
 node_memory_MemTotal_bytes 66892996
 # HELP node_memory_MemAvailable_bytes Memory information field MemAvailable_bytes
 # TYPE node_memory_MemAvailable_bytes gauge
-node_memory_MemAvailable_bytes 45272328
+node_memory_MemAvailable_bytes 45503268
 # HELP node_memory_VirtualMemoryTotal_bytes Memory information field VirtualMemoryTotal_bytes
 # TYPE node_memory_VirtualMemoryTotal_bytes gauge
 node_memory_VirtualMemoryTotal_bytes 71087296
 # HELP node_memory_VirtualMemoryAvailable_bytes Memory information field VirtualMemoryAvailable_bytes
 # TYPE node_memory_VirtualMemoryAvailable_bytes gauge
-node_memory_VirtualMemoryAvailable_bytes 40306968
+node_memory_VirtualMemoryAvailable_bytes 40134200
 # HELP node_exporter_build_info Build information
 # TYPE node_exporter_build_info gauge
 node_exporter_build_info{version="1.0.0.0"} 1

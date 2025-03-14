@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.4" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="9.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,7 +31,7 @@
   <PropertyGroup>
     <DistDirectory>$(MSBuildThisFileDirectory)\dist</DistDirectory>
     <DistDirectoryTemp>$(DistDirectory)\temp</DistDirectoryTemp>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <Target Name="Makedist" AfterTargets="Publish" Condition="$(Configuration) == 'Release'">

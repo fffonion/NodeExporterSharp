@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
 using LibreHardwareMonitor.Hardware;
@@ -12,6 +14,8 @@ namespace HardwareExporter
         private static Dictionary<string, bool> _enabledCollectors = new Dictionary<string, bool>();
         private static int _port = 9182; // Default port similar to node_exporter
         private static int errorsCount = 0;
+        private static Computer computer;
+        private static Dictionary<string, bool> readSensors = new Dictionary<string, bool>(); // updated sensors in current read
 
         static void Main(string[] args)
         {
@@ -20,6 +24,20 @@ namespace HardwareExporter
 
             ParseArgs(args);
             PrintEnabledCollectors();
+
+            computer = new Computer
+            {
+                IsCpuEnabled = _enabledCollectors["hwmon"] || _enabledCollectors["cpu"],
+                IsGpuEnabled = _enabledCollectors["hwmon"],
+                IsMemoryEnabled = _enabledCollectors["memory"],
+                IsMotherboardEnabled = _enabledCollectors["hwmon"],
+                //IsControllerEnabled = true,
+                IsNetworkEnabled = _enabledCollectors["netdev"],
+                IsStorageEnabled = _enabledCollectors["hwmon"]
+            };
+
+            // Initialize LibreHardwareMonitor
+            computer.Open();
 
             // Setup HTTP listener
             _listener = new HttpListener();
@@ -111,23 +129,10 @@ namespace HardwareExporter
                 string path = context.Request.Url.AbsolutePath;
                 if (path == "/metrics")
                 {
+                    readSensors.Clear();
                     StringBuilder metrics = new StringBuilder();
 
-                    var computer = new Computer
-                    {
-                        IsCpuEnabled = true,
-                        IsGpuEnabled = true,
-                        IsMemoryEnabled = true,
-                        IsMotherboardEnabled = true,
-                        //IsControllerEnabled = true,
-                        IsNetworkEnabled = true,
-                        IsStorageEnabled = true
-                    };
                     try {
-                        // Initialize LibreHardwareMonitor
-                        computer.Open();
-
-                        // Collect enabled metrics
                         if (_enabledCollectors["hwmon"])
                             CollectHardwareMonitorMetrics(computer, metrics);
 
@@ -143,11 +148,6 @@ namespace HardwareExporter
                     catch (Exception ex) {
                         Console.WriteLine($"Error opening librehardwaremonitor: {ex.Message} {ex.StackTrace}");
                         errorsCount += 1;
-                    }
-                    finally
-                    {
-                        // Always close the computer connection
-                        if (computer != null) computer.Close();
                     }
 
                     // Add build info
@@ -182,6 +182,15 @@ namespace HardwareExporter
             }
         }
 
+        private static void updateHardwareSensor(IHardware hardware)
+        {
+            if(!readSensors.ContainsKey(hardware.Identifier.ToString()))
+            {
+                hardware.Update();
+                readSensors[hardware.Identifier.ToString()] = true;
+            }
+        }
+
         private static void CollectHardwareMonitorMetrics(Computer computer, StringBuilder metrics)
         {
             try
@@ -198,7 +207,7 @@ namespace HardwareExporter
                 {
                     // Report chip
                     string chipName = hardware.Name.Replace("\"", "\\\"");
-                    hardware.Update();
+                    updateHardwareSensor(hardware);
 
                     foreach (var sensor in hardware.Sensors)
                     {
@@ -230,7 +239,7 @@ namespace HardwareExporter
                     // Also check subhardware
                     foreach (var subhardware in hardware.SubHardware)
                     {
-                        subhardware.Update();
+                        updateHardwareSensor(subhardware);
 
                         foreach (var sensor in subhardware.Sensors)
                         {
@@ -312,112 +321,71 @@ namespace HardwareExporter
             }
         }
 
-        private static void CollectNetworkMetrics(Computer computer, StringBuilder metrics)
+        private static void CollectNetworkMetrics(Computer _, StringBuilder metrics)
         {
-            // First metric - Receive bytes
-            metrics.AppendLine("# HELP node_network_receive_bytes_total Network device statistic receive_bytes");
-            metrics.AppendLine("# TYPE node_network_receive_bytes_total counter");
 
-            // Ensure network hardware is enabled for monitoring
-            computer.IsNetworkEnabled = true;
+            PerformanceCounterCategory category = new PerformanceCounterCategory("Network Interface");
+            String[] instancename = category.GetInstanceNames();
+            Dictionary<string, float> txReadings = new Dictionary<string, float>();
+            Dictionary<string, float> rxReadings = new Dictionary<string, float>();
 
-            // Update hardware information
-            computer.Hardware.ToList().ForEach(hardware => hardware.Update());
-
-            // Output all receive metrics first
-            foreach (var hardware in computer.Hardware.Where(h => h.HardwareType == LibreHardwareMonitor.Hardware.HardwareType.Network))
+            foreach (string name in instancename)
             {
-                hardware.Update();
-                string interfaceName = hardware.Name.Replace("\"", "\\\"");
-
-                foreach (var sensor in hardware.Sensors)
+                using (var counter = new PerformanceCounter("Network Interface", "Bytes Received/sec", name, true))
                 {
-                    if (sensor.SensorType == LibreHardwareMonitor.Hardware.SensorType.Throughput &&
-                        (sensor.Name.Contains("Received") || sensor.Name.Contains("Download")))
-                    {
-                        metrics.AppendLine($"node_network_receive_bytes_total{{device=\"{interfaceName}\"}} {sensor.Value * 1024}");
-                    }
+                    txReadings[name] = counter.RawValue;
+                }
+                using (var counter = new PerformanceCounter("Network Interface", "Bytes Sent/sec", name, true))
+                {
+                    rxReadings[name] = counter.RawValue;
                 }
             }
+            metrics.AppendLine("# HELP node_network_receive_bytes_total Network device statistic receive_bytes");
+            metrics.AppendLine("# TYPE node_network_receive_bytes_total counter");
+            foreach(var name in instancename)
+            {
+                metrics.AppendLine($"node_network_receive_bytes_total{{device=\"{name}\"}} {rxReadings[name]}");
+            }
 
-            // Second metric - Transmit bytes
             metrics.AppendLine("# HELP node_network_transmit_bytes_total Network device statistic transmit_bytes");
             metrics.AppendLine("# TYPE node_network_transmit_bytes_total counter");
-
-            // Output all transmit metrics
-            foreach (var hardware in computer.Hardware.Where(h => h.HardwareType == LibreHardwareMonitor.Hardware.HardwareType.Network))
+            foreach (var name in instancename)
             {
-                string interfaceName = hardware.Name.Replace("\"", "\\\"");
-
-                foreach (var sensor in hardware.Sensors)
-                {
-                    if (sensor.SensorType == LibreHardwareMonitor.Hardware.SensorType.Throughput &&
-                        (sensor.Name.Contains("Sent") || sensor.Name.Contains("Upload")))
-                    {
-                        metrics.AppendLine($"node_network_transmit_bytes_total{{device=\"{interfaceName}\"}} {sensor.Value * 1024}");
-                    }
-                }
+                metrics.AppendLine($"node_network_transmit_bytes_total{{device=\"{name}\"}} {txReadings[name]}");
             }
         }
 
         private static void CollectCpuMetrics(Computer computer, StringBuilder metrics)
         {
-            // First metric - CPU Usage Percentage
-            metrics.AppendLine("# HELP node_cpu_usage_percentage CPU usage percentage per core and total");
-            metrics.AppendLine("# TYPE node_cpu_usage_percentage gauge");
+            PerformanceCounterCategory category = new PerformanceCounterCategory("Processor Information");
+            String[] instancename = category.GetInstanceNames();
 
-            // Ensure CPU hardware is enabled for monitoring
-            computer.IsCpuEnabled = true;
+            metrics.AppendLine("# HELP node_cpu_seconds_total Time that processor spent in different modes (dpc, idle, interrupt, privileged, user)");
+            metrics.AppendLine("# TYPE node_cpu_seconds_total counter");
 
-            // Update hardware information
-            computer.Hardware.ToList().ForEach(hardware => hardware.Update());
-
-            // Output all CPU usage metrics
-            foreach (var hardware in computer.Hardware.Where(h => h.HardwareType == LibreHardwareMonitor.Hardware.HardwareType.Cpu))
+            foreach (string name in instancename)
             {
-                hardware.Update();
-                string cpuName = hardware.Name.Replace("\"", "\\\"");
-
-                // Track if we found the total CPU usage
-                bool foundTotalUsage = false;
-
-                // First look for total CPU usage
-                foreach (var sensor in hardware.Sensors)
+                if (name.EndsWith("_Total"))
+                    continue;
+                using (var counter = new PerformanceCounter("Processor Information", "% DPC Time", name, true))
                 {
-                    if (sensor.SensorType == LibreHardwareMonitor.Hardware.SensorType.Load &&
-                        sensor.Name.Contains("Total"))
-                    {
-                        metrics.AppendLine($"node_cpu_usage_percentage{{cpu=\"{cpuName}\", core=\"total\"}} {sensor.Value}");
-                        foundTotalUsage = true;
-                    }
+                    metrics.AppendLine($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"dpc\"}} {counter.RawValue}");
                 }
-
-                // Then output per-core usage
-                foreach (var sensor in hardware.Sensors)
+                using (var counter = new PerformanceCounter("Processor Information", "% Idle Time", name, true))
                 {
-                    if (sensor.SensorType == LibreHardwareMonitor.Hardware.SensorType.Load &&
-                        sensor.Name.Contains("Core #"))
-                    {
-                        // Extract core number from name (typically in format "Core #1" or similar)
-                        string coreName = sensor.Name;
-                        metrics.AppendLine($"node_cpu_usage_percentage{{cpu=\"{cpuName}\", core=\"{coreName}\"}} {sensor.Value}");
-                    }
+                    metrics.AppendLine($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"idle\"}} {counter.RawValue}");
                 }
-
-                // If we didn't find a total, calculate average from cores as fallback
-                if (!foundTotalUsage)
+                using (var counter = new PerformanceCounter("Processor Information", "% Interrupt Time", name, true))
                 {
-
-                    var coreLoads = hardware.Sensors
-                        .Where(s => s.SensorType == LibreHardwareMonitor.Hardware.SensorType.Load &&
-                               s.Name.Contains("Core #"))
-                        .Select(s => s.Value);
-
-                    if (coreLoads.Any())
-                    {
-                        double avgLoad = coreLoads.Average() ?? 0.0;
-                        metrics.AppendLine($"node_cpu_usage_percentage{{cpu=\"{cpuName}\", core=\"total\"}} {avgLoad}");
-                    }
+                    metrics.AppendLine($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"interrupt\"}} {counter.RawValue}");
+                }
+                using (var counter = new PerformanceCounter("Processor Information", "% Privileged Time", name, true))
+                {
+                    metrics.AppendLine($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"privileged\"}} {counter.RawValue}");
+                }
+                using (var counter = new PerformanceCounter("Processor Information", "% User Time", name, true))
+                {
+                    metrics.AppendLine($"node_cpu_seconds_total{{cpu=\"{name}\",mode=\"user\"}} {counter.RawValue}");
                 }
             }
 
@@ -426,14 +394,14 @@ namespace HardwareExporter
             metrics.AppendLine("# TYPE node_cpu_power_watts gauge");
 
             // Output all CPU power metrics
-            foreach (var hardware in computer.Hardware.Where(h => h.HardwareType == LibreHardwareMonitor.Hardware.HardwareType.Cpu))
+            foreach (var hardware in computer.Hardware.Where(h => h.HardwareType == HardwareType.Cpu))
             {
                 string cpuName = hardware.Name.Replace("\"", "\\\"");
 
                 // Package/Total power
                 foreach (var sensor in hardware.Sensors)
                 {
-                    if (sensor.SensorType == LibreHardwareMonitor.Hardware.SensorType.Power)
+                    if (sensor.SensorType == SensorType.Power)
                     {
                         string powerType = sensor.Name.Contains("Package") ? "package" :
                                           sensor.Name.Contains("Core") ? "cores" :
@@ -462,7 +430,7 @@ namespace HardwareExporter
                     if (hardware.HardwareType == HardwareType.Memory)
                     {
                         // Update the sensors
-                        hardware.Update();
+                        updateHardwareSensor(hardware);
 
                         // Process all sensors
                         foreach (var sensor in hardware.Sensors)
