@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="64" fill="#0078d7"/>
+  
+  <!-- Server/Node representation -->
+  <rect x="128" y="96" width="256" height="320" rx="16" fill="#ffffff"/>
+  
+  <!-- Server lights/details -->
+  <circle cx="160" cy="128" r="8" fill="#5cb85c"/>
+  <circle cx="160" cy="152" r="8" fill="#f0ad4e"/>
+  <rect x="180" y="124" width="180" height="8" rx="4" fill="#e6e6e6"/>
+  <rect x="180" y="148" width="140" height="8" rx="4" fill="#e6e6e6"/>
+  
+  <!-- Data metrics/export visualization -->
+  <path d="M144 200 L368 200" stroke="#e6e6e6" stroke-width="4"/>
+  
+  <!-- Graph lines representing metrics -->
+  <polyline points="144,280 176,260 208,270 240,240 272,250 304,230 336,245 368,220" 
+           stroke="#ff5722" stroke-width="6" fill="none"/>
+  <polyline points="144,320 176,330 208,310 240,340 272,320 304,335 336,315 368,330" 
+           stroke="#4caf50" stroke-width="6" fill="none"/>
+  
+  <!-- .NET logo -->
+  <g transform="translate(256, 380)">
+    <rect x="-32" y="-16" width="64" height="32" rx="4" fill="#512bd4"/>
+    <path d="M-20,0 L-20,-8 L-16,-8 L-16,8 L-20,8 L-20,0 L-24,0 L-24,-8 L-20,-8 M-14,8 L-14,-8 L-10,-8 L-4,0 L2,-8 L6,-8 L6,8 L2,8 L2,-4 L-4,4 L-10,-4 L-10,8 L-14,8 M8,8 L8,-8 L20,-8 L20,-4 L12,-4 L12,-2 L18,-2 L18,2 L12,2 L12,4 L20,4 L20,8 L8,8" fill="white"/>
+  </g>
+  
+  <!-- Prometheus symbol -->
+  <g transform="translate(400, 112) scale(0.5)">
+    <circle cx="0" cy="0" r="40" fill="#e6522c"/>
+    <path d="M-15,-5 L15,-5 L15,5 L-15,5 Z" fill="white"/>
+    <path d="M-15,-20 L15,-20 L15,-10 L-15,-10 Z" fill="white"/>
+    <path d="M-15,10 L15,10 L15,20 L-15,20 Z" fill="white"/>
+  </g>
+</svg>
