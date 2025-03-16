@@ -313,7 +313,7 @@ namespace HardwareExporter
                     "# TYPE node_hwmon_pwm gauge");
                 foreach (var sensor in pwms)
                 {
-                    metrics.AppendLineUnix($"node_hwmon_pwm{{chip=\"{sensor.Hardware.Identifier}\",hardware=\"{sensor.Hardware.Identifier}\"}} {sensor.Value.Value / 100 * 255}");
+                    metrics.AppendLineUnix($"node_hwmon_pwm{{chip=\"{sensor.Identifier}\",hardware=\"{sensor.Hardware.Identifier}\"}} {sensor.Value.Value / 100 * 255}");
                 }
 
                 // Fan RPM metrics
@@ -322,7 +322,7 @@ namespace HardwareExporter
                     "# TYPE node_hwmon_fan_rpm gauge");
                 foreach (var sensor in rpms)
                 {
-                    metrics.AppendLineUnix($"node_hwmon_fan_rpm{{chip=\"{sensor.Hardware.Identifier}\",hardware=\"{sensor.Hardware.Identifier}\"}} {sensor.Value.Value}");
+                    metrics.AppendLineUnix($"node_hwmon_fan_rpm{{chip=\"{sensor.Identifier}\",hardware=\"{sensor.Hardware.Identifier}\"}} {sensor.Value.Value}");
                 }
             }
             finally
