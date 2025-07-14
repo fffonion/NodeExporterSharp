@@ -1,9 +1,10 @@
+using LibreHardwareMonitor.Hardware;
 using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
-using LibreHardwareMonitor.Hardware;
+using System.Text.RegularExpressions;
 
 namespace HardwareExporter
 {
@@ -12,6 +13,84 @@ namespace HardwareExporter
         public static StringBuilder AppendLineUnix(this StringBuilder sb, string value = "")
         {
             return sb.Append(value).Append('\n');
+        }
+    }
+
+    public struct ApcUpsInfo
+    {
+        public string Name { get; set; }
+        public bool DeviceOnline { get; set; }
+        public double UpsLoad { get; set; }
+        public int RuntimeMinutesRemaining { get; set; }
+        public double InputVoltage { get; set; }
+        public double BatteryCharge { get; set; }
+        public double BatteryVoltage { get; set; }
+    }
+
+    public class ApcUpsStatusReader
+    {
+        public static async Task<ApcUpsInfo> GetUpsStatusAlternativeAsync()
+        {
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
+            };
+
+            using (var client = new HttpClient(handler))
+            {
+                string html = await client.GetStringAsync("https://localhost:6547");
+                var upsInfo = new ApcUpsInfo();
+
+                var namePattern = @"<li class=""submenuheader"">([^<]+)</li>";
+                var nameMatch = Regex.Match(html, namePattern);
+                if (nameMatch.Success)
+                {
+                    upsInfo.Name = nameMatch.Groups[1].Value.Trim();
+                }
+                else
+                {
+                    upsInfo.Name = "Unknown Model";
+                }
+
+                // Generic pattern to match all value divs
+                var valuePattern = @"<div class=""value"" id=""value_(\w+)"">([^<]+)</div>";
+                var matches = Regex.Matches(html, valuePattern);
+
+                foreach (Match match in matches)
+                {
+                    string id = match.Groups[1].Value;
+                    string value = match.Groups[2].Value.Trim();
+
+                    switch (id)
+                    {
+                        case "DeviceStatus":
+                            upsInfo.DeviceOnline = value == "On Line";
+                            break;
+                        case "RealPowerPct":
+                            double.TryParse(value, out double upsLoad);
+                            upsInfo.UpsLoad = upsLoad;
+                            break;
+                        case "RuntimeRemaining":
+                            int.TryParse(value, out int runtime);
+                            upsInfo.RuntimeMinutesRemaining = runtime;
+                            break;
+                        case "InputVoltage":
+                            double.TryParse(value, out double inputVoltage);
+                            upsInfo.InputVoltage = inputVoltage;
+                            break;
+                        case "BatteryCharge":
+                            double.TryParse(value, out double batteryCharge);
+                            upsInfo.BatteryCharge = batteryCharge;
+                            break;
+                        case "VoltageDC":
+                            double.TryParse(value, out double batteryVoltage);
+                            upsInfo.BatteryVoltage = batteryVoltage;
+                            break;
+                    }
+                }
+
+                return upsInfo;
+            }
         }
     }
 
@@ -77,6 +156,7 @@ namespace HardwareExporter
             _enabledCollectors["netdev"] = true;
             _enabledCollectors["cpu"] = true;
             _enabledCollectors["memory"] = true;
+            _enabledCollectors["apcups"] = true;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -153,6 +233,9 @@ namespace HardwareExporter
 
                         if (_enabledCollectors["memory"])
                             CollectMemoryMetrics(computer, metrics);
+
+                        if (_enabledCollectors["apcups"])
+                            CollectApcUpsMetrics(metrics);
                     }
                     catch (Exception ex) {
                         Console.WriteLine($"Error opening librehardwaremonitor: {ex.Message} {ex.StackTrace}");
@@ -529,5 +612,39 @@ namespace HardwareExporter
                 Console.WriteLine($"Error collecting memory metrics: {ex.Message}");
             }
         }
+
+        private static void CollectApcUpsMetrics(StringBuilder metrics)
+        {
+            try
+            {
+                ApcUpsInfo upsInfo = ApcUpsStatusReader.GetUpsStatusAlternativeAsync().GetAwaiter().GetResult();
+                // expose metrics with name as label
+                metrics.AppendLineUnix("# HELP node_ups_device_online Whether the UPS device is online");
+                metrics.AppendLineUnix("# TYPE node_ups_device_online gauge");
+                metrics.AppendLineUnix($"node_ups_device_online{{name=\"{upsInfo.Name}\"}} {(upsInfo.DeviceOnline ? 1 : 0)}");
+                metrics.AppendLineUnix("# HELP node_ups_load_percent UPS load percentage");
+                metrics.AppendLineUnix("# TYPE node_ups_load_percent gauge");
+                metrics.AppendLineUnix($"node_ups_load_percent{{name=\"{upsInfo.Name}\"}} {upsInfo.UpsLoad}");
+                metrics.AppendLineUnix("# HELP node_ups_runtime_minutes_remaining UPS runtime in minutes remaining");
+                metrics.AppendLineUnix(
+                    "# TYPE node_ups_runtime_minutes_remaining gauge");
+                metrics.AppendLineUnix($"node_ups_runtime_minutes_remaining{{name=\"{upsInfo.Name}\"}} {upsInfo.RuntimeMinutesRemaining}");
+                metrics.AppendLineUnix("# HELP node_ups_input_voltage UPS input voltage in volts");
+                metrics.AppendLineUnix("# TYPE node_ups_input_voltage gauge");
+                metrics.AppendLineUnix($"node_ups_input_voltage{{name=\"{upsInfo.Name}\"}} {upsInfo.InputVoltage}");
+                metrics.AppendLineUnix("# HELP node_ups_battery_charge UPS battery charge in percentage");
+                metrics.AppendLineUnix("# TYPE node_ups_battery_charge gauge");
+                metrics.AppendLineUnix($"node_ups_battery_charge{{name=\"{upsInfo.Name}\"}} {upsInfo.BatteryCharge}");
+                metrics.AppendLineUnix("# HELP node_ups_battery_voltage UPS battery voltage in volts");
+                metrics.AppendLineUnix("# TYPE node_ups_battery_voltage gauge");
+                metrics.AppendLineUnix($"node_ups_battery_voltage{{name=\"{upsInfo.Name}\"}} {upsInfo.BatteryVoltage}");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error collecting APC UPS metrics: {ex.Message}");
+            }
+        }
+
     }
 }
