@@ -11,6 +11,7 @@ Node Exporter Sharp is a comprehensive replacement for the popular `node_exporte
   - Network interface statistics
   - CPU utilization
   - Memory usage
+  - UPS status from APC PowerChute or NUT upsd
 
 - **GPU and SSD Sensors**: In addition to the standard metrics, Node Exporter Sharp also provides access to GPU and SSD sensors, which are not available in the original `node_exporter` and `windows_exporter` tools.
 
@@ -20,11 +21,22 @@ Node Exporter Sharp is a comprehensive replacement for the popular `node_exporte
 
 Node Exporter Sharp supports the following command-line arguments:
 
-- `--port <port>`: Specifies the port on which the server will listen (default is 9100).
-- `--no-<collector>`: Disables the specified collector. Available collectors are: `hwmon`, `netdev`, `cpu`, `memory`.
-- `--collector.<collector>`: Enables the specified collector. Available collectors are: `hwmon`, `netdev`, `cpu`, `memory`.
+- `--port <port>`: Specifies the port on which the server will listen (default is 9182).
+- `--no-<collector>`: Disables the specified collector. Available collectors are: `hwmon`, `netdev`, `cpu`, `memory`, `apcups`, `upsd`.
+- `--collector.<collector>`: Enables the specified collector. Available collectors are: `hwmon`, `netdev`, `cpu`, `memory`, `apcups`, `upsd`.
 
-By default, all collectors are enabled.
+By default, `hwmon`, `netdev`, `cpu`, and `memory` are enabled; `apcups` and `upsd` are disabled. The `apcups` and `upsd` collectors cannot be enabled at the same time. To use NUT upsd, enable the collector explicitly:
+
+```
+NodeExporterSharp.exe --collector.upsd
+```
+
+## upsd Configuration
+
+The `upsd` collector connects to a local NUT upsd server and discovers UPS names with the upsd protocol. It does not require a configured UPS name.
+
+- `NODE_EXPORTER_UPSD_HOST`: upsd host (default is `127.0.0.1`).
+- `NODE_EXPORTER_UPSD_PORT`: upsd TCP port (default is `3493`).
 
 ## Highlights
 

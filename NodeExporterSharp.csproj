@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="NodeExporterSharp.Tests\**\*.cs" />
+    <EmbeddedResource Remove="NodeExporterSharp.Tests\**\*" />
+    <None Remove="NodeExporterSharp.Tests\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="icon.ico" />
   </ItemGroup>
 
